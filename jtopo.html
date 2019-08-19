@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .box{
+            width: 500px;
+            height: 500px;
+            border: solid 1px red;
+        }
+       </style>
+</head>
+<body>
+    <canvas id="canvas" width="500" height="500" class="box">
+
+    </canvas>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script src="./jtopo-0.4.8-min.js"></script>
+    <script>
+     $(document).ready(function(){                    
+        var canvas = document.getElementById('canvas'); 
+            var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
+            var scene = new JTopo.Scene(stage); // 创建一个场景对象
+        
+            var cloudNode = new JTopo.Node('root');
+            cloudNode.setSize(30, 26);
+            cloudNode.setLocation(220,30);            
+            cloudNode.layout = {type: 'tree', width:180, height: 100}
+            
+            scene.add(cloudNode);
+            
+            for(var i=1; i<4; i++){
+                var node = new JTopo.CircleNode('host' + i);
+                node.fillStyle = '200,255,0';
+                node.radius = 15;
+                node.setLocation(scene.width * Math.random(), scene.height * Math.random());
+                node.layout = {type: 'tree', width:50, height: 100};
+                
+                scene.add(node);                                
+                var link = new JTopo.Link(cloudNode, node);
+                scene.add(link);
+                
+                for(var j=0; j<4; j++){
+                    var vmNode = new JTopo.CircleNode('vm-' + i + '-' + j);
+                    vmNode.radius = 10;
+                    vmNode.fillStyle = '255,255,0';
+                    vmNode.setLocation(scene.width * Math.random(), scene.height * Math.random());
+                    scene.add(vmNode);                                
+                    scene.add(new JTopo.Link(node, vmNode));                            
+                }
+            }
+            JTopo.layout.layoutNode(scene, cloudNode, true);
+            
+            scene.addEventListener('mouseup', function(e){
+                if(e.target && e.target.layout){
+                    JTopo.layout.layoutNode(scene, e.target, true);    
+                }                
+            });
+        });              
+    </script>
+</body>
+</html>
